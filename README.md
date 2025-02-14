@@ -26,6 +26,11 @@ git clone https://github.com/Dalle2fan/MC-SeedLocator.git
 cd MC-SeedLocator
 ```
 
+### **If you don't have Homebrew installed yet**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
 ### **Install Dependencies**  
 ```bash
 npm install
