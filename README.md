@@ -3,7 +3,7 @@
 ## **Website:** [mc-seed-finder.replit.app](https://mc-seed-finder.replit.app/)  
 
 ## **Overview**  
-This tool automates finding Minecraft seeds based on specific biomes, structures, and terrain features. Supports Java and Bedrock editions (1.18–1.21+).  
+This tool automates finding Minecraft seeds based on specific biomes, structures, and terrain features. Supports Java and Bedrock editions (1.18 to 1.21.4)
 
 ## **Features**  
 - Define custom biomes, including islands, valleys, and encircling terrain 
