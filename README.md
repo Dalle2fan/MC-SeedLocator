@@ -22,8 +22,8 @@ This tool automates finding Minecraft seeds based on specific biomes, structures
 
 ### **Clone the Repository**  
 ```bash
-git clone <your-github-repository-url>
-cd <your-project-folder>
+git clone https://github.com/Dalle2fan/MC-SeedLocator.git
+cd MC-SeedLocator
 ```
 
 ### **Install Dependencies**  
