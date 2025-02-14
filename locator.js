@@ -123,59 +123,60 @@ function c(a, b, c) {
     }
   return { biomes: i, scale: 1 };
 }
-let CB3SharedTaskManager = {
-  create: function (a) {
-    var b = {};
-    return (
-      globalThis.emitter.addListener("message", function (c) {
-        if ("sharedTaskResult" === c.type) {
-          var d = c.key;
-          if (!b[d]) return;
-          b[d].onResult(c.data.result), delete b[d];
-        } else if ("sharedTaskPerform" === c.type) {
-          var d = c.key;
-          if (!b[d]) return;
-          b[d]
-            .performTask()
-            .then(function (c) {
-              globalThis.emitter.emit("message", {
-                type: "sharedTaskPerformResult",
-                key: d,
-                result: c,
-              }),
-                b[d].onResult(c),
-                delete b[d];
-            })
-            .catch(function (a) {
-              throw a;
-            });
-        }
-      }),
-      {
-        handleTask: function (c, d) {
-          if (b[c]) throw new Error("task already exists");
-          return new Promise(function (e) {
-            (b[c] = {
-              onResult: e,
-              performTask: d,
-            }),
-              globalThis.emitter.emit("message", {
-                type: "sharedTaskGet",
-                key: c,
+  let CB3SharedTaskManager = {
+    create: function (a) {
+      var b = {};
+      return (
+        globalThis.emitter.addListener("message", function (c) {
+          if ("sharedTaskResult" === c.type) {
+            var d = c.key;
+            if (!b[d]) return;
+            b[d].onResult(c.data.result), delete b[d];
+          } else if ("sharedTaskPerform" === c.type) {
+            var d = c.key;
+            if (!b[d]) return;
+            b[d]
+              .performTask()
+              .then(function (c) {
+                globalThis.emitter.emit("message", {
+                  type: "sharedTaskPerformResult",
+                  key: d,
+                  result: c,
+                }),
+                  b[d].onResult(c),
+                  delete b[d];
+              })
+              .catch(function (a) {
+                throw a;
               });
-          });
-        },
-      }
-    );
-  },
-};
-let CB3Libs = superComplexWasm();
+          }
+        }),
+        {
+          handleTask: function (c, d) {
+            if (b[c]) throw new Error("task already exists");
+            return new Promise(function (e) {
+              (b[c] = {
+                onResult: e,
+                performTask: d,
+              }),
+                globalThis.emitter.emit("message", {
+                  type: "sharedTaskGet",
+                  key: c,
+                });
+            });
+          },
+        }
+      );
+    },
+  };
 
-var g = null,
-  h = null,
-  i = null;
-let j = CB3SharedTaskManager.create(globalThis);
-function a(b, c) {
+  let CB3Libs = superComplexWasm();
+
+  var g = null,
+    h = null,
+    i = null;
+  let j = CB3SharedTaskManager.create(globalThis);
+  function a(b, c) {
   if ("object" == typeof b && null != b && "object" == typeof c && null != c) {
     var d = [0, 0];
     for (var e in b) d[0]++;
@@ -227,7 +228,6 @@ function getResults(a) {
   return g(i, f.pois).then(function (a) {
     var b = null,
       e = h[f.dimension];
-
     return (
       f.dimension === CB3Libs.Dimension.Overworld
         ? (b = c(e, i, f))
@@ -253,16 +253,6 @@ export function getSupportedPPois(platform) {
     platform: platform,
   };
 }
-// console.log(
-//   getSupportedPPois({
-//     label: "Java 1.20",
-//     cb3World: {
-//       edition: "Java",
-//       javaVersion: 10200,
-//       config: {},
-//     },
-//   })
-// );
 
 globalThis.emitter.addListener("message", (result) => {
   if (result.type == "sharedTaskGet") {
@@ -272,6 +262,7 @@ globalThis.emitter.addListener("message", (result) => {
     });
   }
 });
+
 /**
  *  Finds the closest structure to a given point
  * @constructor
@@ -283,7 +274,7 @@ function findClosest(coords, features) {
   let closestDistance = null;
   features.forEach((feature) => {
     let distance = Math.sqrt(
-      Math.pow(coords[0] - feature.x, 2) + Math.pow(coords[1] - feature.z, 2),
+      Math.pow(coords[0] - feature[0], 2) + Math.pow(coords[1] - feature[1], 2)
     );
     if (!closest || distance < closestDistance) {
       closest = feature;
@@ -292,6 +283,7 @@ function findClosest(coords, features) {
   });
   return closest;
 }
+
 /**
  *  Gets structures in a given area
  * @constructor
@@ -300,24 +292,25 @@ function findClosest(coords, features) {
  * @param {string[]} pois - The structures to search for
  * @param {object} optionals - Optional parameters
  */
-export async function getAreaResult(seed, coords, pois, optionals) {
+export async function getAreaResult(seed, coords, pois, optionals, retryCount = 3) {
   let params = {
     tileSize: 16,
     searchWidth: 8,
     edition: "Java",
-    javaVersion: 10200,
-    tileScale: 0.25,
+    javaVersion: 10210,
+    tileScale: 0.25, // retained for other purposes (e.g. biome scaling)
     dimension: "overworld",
     biomeHeight: "worldSurface",
   };
   if (optionals) {
     params = { ...params, ...optionals };
   }
-  let [x, z] = coords;
-  // Make the x and z center of the search area by subtracting half the search width
-  // Make sure it's still an integer
-  x -= Math.round((params.searchWidth * params.tileSize) / 2);
-  z -= Math.round((params.searchWidth * params.tileSize) / 2);
+  let [centerX, centerZ] = coords;
+  // Calculate the total search area size and the starting (top‐left) coordinates.
+  const totalAreaSize = params.searchWidth * params.tileSize;
+  const startX = Math.floor(centerX - totalAreaSize / 2);
+  const startZ = Math.floor(centerZ - totalAreaSize / 2);
+
   let request = {
     type: "check",
     params: {
@@ -325,7 +318,8 @@ export async function getAreaResult(seed, coords, pois, optionals) {
       platform: {
         cb3World: {
           edition: params.edition,
-          javaVersion: params.javaVersion,
+          ...(params.edition === "Java" && { javaVersion: params.javaVersion }),
+            ...(params.edition === "Bedrock" && { bedrockVersion: 10210 }),
           config: {},
         },
       },
@@ -339,17 +333,20 @@ export async function getAreaResult(seed, coords, pois, optionals) {
       showHeights: true,
     },
     tile: {
-      x: x,
-      z: z,
+      x: startX,
+      z: startZ,
       xL: params.tileSize,
       zL: params.tileSize,
       scale: params.tileScale,
     },
   };
+
   let allResults = [];
+
+  // Handle stronghold separately if requested.
   let strongholdResult = null;
   if (pois.includes("stronghold")) {
-    // Create promise for stronghold
+    // Create promise for stronghold.
     strongholdResult = new Promise((resolve) => {
       globalThis.emitter.addListener("message", (result) => {
         if (result.type === "sharedTaskPerformResult") {
@@ -358,47 +355,70 @@ export async function getAreaResult(seed, coords, pois, optionals) {
       });
     });
   }
-  for (let h = 0; h < params.searchWidth; h++) {
-    for (let v = 0; v < params.searchWidth; v++) {
-      let result = await getResults(request);
 
+  // Loop over the grid of tiles.
+  for (let i = 0; i < params.searchWidth; i++) {
+    for (let j = 0; j < params.searchWidth; j++) {
+      // Compute the absolute top‐left coordinates for this tile.
+      const tileX = startX + j * params.tileSize;
+      const tileZ = startZ + i * params.tileSize;
+      // Update the request tile coordinates.
+      request.tile.x = tileX;
+      request.tile.z = tileZ;
+
+      let result;
+      let attempts = 0;
+      while (attempts < retryCount) {
+        try {
+          result = await getResults(request);
+          break;
+        } catch (error) {
+          attempts++;
+          if (attempts === retryCount) {
+            console.error(`Failed after ${retryCount} attempts:`, error);
+            throw error;
+          }
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Process all structure entries from this tile.
       for (const key in result.poiResults) {
-        if (result.poiResults.hasOwnProperty(key)) {
-          const value = result.poiResults[key];
-          if (value.length > 0) {
-            value[0][0] *= params.tileScale;
-            value[0][1] *= params.tileScale;
+        if (Object.prototype.hasOwnProperty.call(result.poiResults, key)) {
+          const entries = result.poiResults[key];
+          // Iterate over every returned structure entry (not just the first one).
+          for (const entry of entries) {
+            // Each entry is expected to be an array: [relativeX, relativeZ, metadata]
+            // Compute absolute coordinates: add the tile’s offset plus the relative coordinate scaled by tileSize.
+            const relX = entry[0];
+            const relZ = entry[1];
+            const absX = tileX + relX * params.tileSize;
+            const absZ = tileZ + relZ * params.tileSize;
             allResults.push({
               type: key,
-              x: value[0][0],
-              z: value[0][1],
-              metadata: value[0][2],
+              x: Math.round(absX),
+              z: Math.round(absZ),
+              metadata: entry[2],
             });
           }
         }
       }
-
-      request.tile.z += params.tileSize;
     }
-    request.tile.x += params.tileSize;
   }
 
-  // Wait for stronghold promise to resolve
+  // Wait for and process stronghold results if available.
   if (strongholdResult) {
     strongholdResult = await strongholdResult;
     let closestStronghold = findClosest(coords, strongholdResult);
     allResults.push({
       type: "stronghold",
-      x: closestStronghold[0] * params.tileSize,
-      z: closestStronghold[1] * params.tileSize,
+      x: Math.round(closestStronghold[0] * params.tileSize),
+      z: Math.round(closestStronghold[1] * params.tileSize),
       metadata: {},
     });
   }
   return allResults;
 }
-try {
-  module.exports = {
-    getAreaResult: getAreaResult,
-    getSupportedPPois: getSupportedPPois,
-  };
-} catch (e) {}
+
+export { getResults };
