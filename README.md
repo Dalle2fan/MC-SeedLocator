@@ -14,9 +14,9 @@ This tool automates finding Minecraft seeds based on specific biomes, structures
 ## **Usage**  
 1. Define search parameters  
 2. Select Minecraft version and edition  
-3. Set search center using coordinates or spawn point  
-4. Choose search radius (up to 10,000 blocks)  
-5. Run the scan  
+3. Set search center using coordinates or spawn point
+4. Set the seed requirments (such as at least 1 village and Cherry Grove within 500 block search radius from spawn for example)
+6. Run the scan, might taKe a few minutes depending on the rarity of the seed requirements
 
 ## **Installation**  
 
