@@ -35,6 +35,7 @@ brew install node
 ### **Install Dependencies**  
 ```bash
 npm install
+npm install express
 ```
 
 ### **Run the Application**  
