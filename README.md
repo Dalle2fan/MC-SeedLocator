@@ -26,9 +26,10 @@ git clone https://github.com/Dalle2fan/MC-SeedLocator.git
 cd MC-SeedLocator
 ```
 
-### **If you don't have Homebrew installed yet**
+### **If you don't have NodeJS installed yet, use Homebrew to install ite**
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install node
 ```
 
 ### **Install Dependencies**  
