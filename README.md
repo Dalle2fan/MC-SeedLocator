@@ -34,8 +34,7 @@ brew install node
 
 ### **Install Dependencies**  
 ```bash
-npm install
-npm install express
+npm install express p-limit --save
 ```
 
 ### **Run the Application**  
