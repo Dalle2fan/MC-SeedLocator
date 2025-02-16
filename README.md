@@ -1,4 +1,4 @@
-# **Advanced Minecraft Seed Finder Website**  
+# **Advanced Minecraft Seed Finder**  
 
 ## **Website:** [mc-seed-finder.replit.app](https://mc-seed-finder.replit.app/)  
 
