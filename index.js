@@ -1127,7 +1127,7 @@ function getSurfaceHeightAtPosition(biomeData, x, z) {
 }
 
 async function scanSeeds(sendLog, isActive, config) {
-  const workerCount = 100;
+  const workerCount = 15;
   let seedsScanned = 0;
   let foundSeeds = 0;
   const startTime = Date.now();
