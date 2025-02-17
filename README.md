@@ -44,9 +44,3 @@ npm install express p-limit --save
 npm start
 ```
 Visit `http://localhost:3000` in a browser.  
-
-## **Contributing**  
-1. Fork the repository  
-2. Create a new branch (`git checkout -b feature-branch`)  
-3. Commit changes (`git commit -m "Added feature"`)  
-4. Push and submit a pull request  
