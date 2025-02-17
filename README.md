@@ -50,6 +50,3 @@ Visit `http://localhost:3000` in a browser.
 2. Create a new branch (`git checkout -b feature-branch`)  
 3. Commit changes (`git commit -m "Added feature"`)  
 4. Push and submit a pull request  
-
-## **License**  
-This project is licensed under the MIT License.
