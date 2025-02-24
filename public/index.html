@@ -512,10 +512,8 @@
     let currentInvalidCombo = [];
     document.getElementById("addToInvalidCombo").addEventListener("click", () => {
       const structure = document.getElementById("invalidComboDropdown").value;
-      if (!currentInvalidCombo.includes(structure)) {
-        currentInvalidCombo.push(structure);
-        renderCombo("currentInvalidCombo", currentInvalidCombo);
-      }
+      currentInvalidCombo.push(structure);
+      renderCombo("currentInvalidCombo", currentInvalidCombo);
       document.getElementById("saveInvalidCombo").style.display = currentInvalidCombo.length >= 2 ? "block" : "none";
     });
     document.getElementById("saveInvalidCombo").addEventListener("click", () => {
